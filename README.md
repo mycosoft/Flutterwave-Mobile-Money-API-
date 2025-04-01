@@ -118,7 +118,7 @@ public function verifyPayment($reference)
 ## Screenshots
 
 ### Payment Form
-![Payment Form](screenshots/payment_form.png)
+![Payment Form](screenshots/{7E8F9448-8A0C-4107-BB79-CC192A11B3B1}.png)
 
 ### Payment Options
 ![Payment Options](screenshots/payment_options.png)
