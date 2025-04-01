@@ -121,7 +121,7 @@ public function verifyPayment($reference)
 ![Payment Form](screenshots/{7E8F9448-8A0C-4107-BB79-CC192A11B3B1}.png)
 
 ### Payment Options
-![Payment Options](screenshots/payment_options.png)
+![Payment Options](screenshots/{D58C67A8-3863-4C1F-A21F-BD2C987C3EBB}.png)
 
 ### OTP Verification
 ![OTP Verification](screenshots/otp_verification.png)
