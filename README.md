@@ -1,66 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Flutterwave Mobile Money Payment API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This integration provides a reusable API for processing mobile money and credit card payments using Flutterwave in your Laravel projects.
 
-## About Laravel
+![Mobile Money Payment API](https://flutterwave.com/images/banners/flutterwave-standard.png)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Credit/Debit Card payments
+- Mobile Money payments (MTN, Vodafone, Airtel, etc.)
+- Bank Transfer payments
+- Support for multiple countries (Uganda, Ghana, Kenya, Rwanda, Tanzania, Nigeria)
+- Webhook handling for payment notifications
+- Comprehensive error handling
+- Beautiful, responsive UI with Bootstrap
+- Easy to integrate into any Laravel project
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Setup Instructions
 
-## Learning Laravel
+### 1. Environment Configuration
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Add the following variables to your `.env` file:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+FLUTTERWAVE_PUBLIC_KEY=your_public_key_here
+FLUTTERWAVE_SECRET_KEY=your_secret_key_here
+FLUTTERWAVE_ENCRYPTION_KEY=your_encryption_key_here
+FLUTTERWAVE_WEBHOOK_SECRET=your_webhook_hash_here
+FLUTTERWAVE_ENVIRONMENT=sandbox  # Change to 'live' for production
+FLUTTERWAVE_LOGO_URL=https://your-website.com/logo.png  # Optional
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Register Webhook URL
 
-## Laravel Sponsors
+In your Flutterwave dashboard, set up a webhook URL that points to:
+```
+https://your-domain.com/api/flutterwave/webhook
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Usage Examples
 
-### Premium Partners
+### Basic Payment Initialization
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```php
+use App\Services\FlutterwaveService;
 
-## Contributing
+class YourController extends Controller
+{
+    protected $flutterwaveService;
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    public function __construct(FlutterwaveService $flutterwaveService)
+    {
+        $this->flutterwaveService = $flutterwaveService;
+    }
 
-## Code of Conduct
+    public function makePayment(Request $request)
+    {
+        $paymentData = [
+            'amount' => 100.00,
+            'email' => 'customer@example.com',
+            'name' => 'John Doe',
+            'phone' => '0123456789',
+            'payment_method' => 'card', // 'card', 'mobilemoney', or 'bank_transfer'
+            'currency' => 'USD',
+            'redirect_url' => route('payment.callback'),
+            'meta' => [
+                'order_id' => 'ORDER-123',
+                'user_id' => auth()->id(),
+            ],
+        ];
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+        $response = $this->flutterwaveService->initializePayment($paymentData);
+        
+        if ($response['status'] === 'success') {
+            return redirect($response['data']['link']);
+        }
+        
+        return back()->with('error', 'Payment initialization failed');
+    }
+}
+```
 
-## Security Vulnerabilities
+### Mobile Money Payment
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+For mobile money payments, include additional parameters:
+
+```php
+$paymentData = [
+    // ... basic payment data
+    'payment_method' => 'mobilemoney',
+    'currency' => 'UGX', // Currency code for the country
+    'network' => 'AIRTEL', // Mobile network provider (MTN or AIRTEL for Uganda)
+    'country' => 'UG', // Country code
+];
+```
+
+> **Important Note for Uganda Mobile Money:**
+> - Phone number must be in international format with country code 256
+> - Network must be either 'MTN' or 'AIRTEL'
+> - Currency should be 'UGX'
+
+### Verifying Payments
+
+```php
+public function verifyPayment($reference)
+{
+    $verification = $this->flutterwaveService->verifyPayment($reference);
+    
+    if ($verification['status'] === 'success') {
+        // Payment successful, update your database
+        return view('payment.success', ['transaction' => $verification['data']]);
+    }
+    
+    return view('payment.failed');
+}
+```
+
+## API Documentation
+
+### FlutterwaveService Methods
+
+#### `initializePayment(array $data)`
+
+Initializes a payment transaction.
+
+Parameters:
+- `amount`: (required) Amount to charge
+- `email`: (required) Customer's email
+- `name`: (required) Customer's name
+- `phone`: (required) Customer's phone number
+- `payment_method`: (required) Payment method ('card', 'mobilemoney', 'bank_transfer')
+- `currency`: (required) 3-letter currency code
+- `redirect_url`: (required) URL to redirect after payment
+- `meta`: (optional) Additional metadata
+- `network`: (optional) Mobile network for mobile money
+- `country`: (optional) Country code for mobile money
+
+Returns:
+- Array containing payment link and transaction reference
+
+#### `verifyPayment(string $reference)`
+
+Verifies a payment transaction.
+
+Parameters:
+- `reference`: Transaction reference
+
+Returns:
+- Array containing transaction status and details
+
+#### `verifyWebhookSignature(string $signature)`
+
+Verifies the webhook signature from Flutterwave.
+
+Parameters:
+- `signature`: Signature from request header
+
+Returns:
+- Boolean indicating if signature is valid
+
+#### `processWebhook(string $event, array $data)`
+
+Processes webhook notifications.
+
+Parameters:
+- `event`: Event type
+- `data`: Event data
+
+## Webhook Events
+
+The integration handles the following webhook events:
+- `charge.completed`: When a payment is completed
+- `transfer.completed`: When a transfer is completed
+- `payment.failed`: When a payment fails
+
+## Example Implementation
+
+This package includes an example implementation in:
+- `PaymentExampleController.php`
+- `resources/views/payments/form.blade.php`
+- `resources/views/welcome.blade.php`
+- `resources/views/payments/success.blade.php`
+- `resources/views/payments/failed.blade.php`
+
+## Security Considerations
+
+- Never expose your secret key or encryption key
+- Always verify payments server-side
+- Validate webhook signatures
+- Use HTTPS for all API calls
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Developed By
+
+Mycosoft Technologies
