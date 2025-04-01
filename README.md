@@ -2,8 +2,6 @@
 
 This integration provides a reusable API for processing mobile money and credit card payments using Flutterwave in your Laravel projects.
 
-![Mobile Money Payment API](https://flutterwave.com/images/banners/flutterwave-standard.png)
-
 ## Features
 
 - Credit/Debit Card payments
