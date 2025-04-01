@@ -115,6 +115,17 @@ public function verifyPayment($reference)
 }
 ```
 
+## Screenshots
+
+### Payment Form
+![Payment Form](screenshots/payment_form.png)
+
+### Payment Options
+![Payment Options](screenshots/payment_options.png)
+
+### OTP Verification
+![OTP Verification](screenshots/otp_verification.png)
+
 ## API Documentation
 
 ### FlutterwaveService Methods
