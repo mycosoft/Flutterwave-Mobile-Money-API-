@@ -30,13 +30,6 @@ FLUTTERWAVE_ENVIRONMENT=sandbox  # Change to 'live' for production
 FLUTTERWAVE_LOGO_URL=https://your-website.com/logo.png  # Optional
 ```
 
-### 2. Register Webhook URL
-
-In your Flutterwave dashboard, set up a webhook URL that points to:
-```
-https://your-domain.com/api/flutterwave/webhook
-```
-
 ## Usage Examples
 
 ### Basic Payment Initialization
@@ -124,7 +117,7 @@ public function verifyPayment($reference)
 ![Payment Options](screenshots/{D58C67A8-3863-4C1F-A21F-BD2C987C3EBB}.png)
 
 ### OTP Verification
-![OTP Verification](screenshots/otp_verification.png)
+![OTP Verification](screenshots/{F2D61642-C33D-4580-BB68-722EADE6E4A0}.png)
 
 ## API Documentation
 
