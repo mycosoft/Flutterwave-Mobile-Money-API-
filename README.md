@@ -196,3 +196,9 @@ This project is open-sourced software licensed under the [MIT license](https://o
 ## Developed By
 
 Mycosoft Technologies
+
+### Contact Information
+
+- **Phone:** +256 750501151 or +256 781779477
+- **Email:** mycosoftofficial@gmail.com
+- **Website:** [mycosofttechnologies.com](https://mycosofttechnologies.com)
